@@ -1,2 +1,2 @@
-# Yogalax_23-08-23
+# YogaDham
 Create an Engaging Yoga Classes Landing Page | HTML, CSS &amp; JS Tutorial with ScrollReveal Animations!
