@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasta Mudras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        img {
+            max-width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Hasta Mudras</h1>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Description</th>
+            <th>Benefits</th>
+        </tr>
+        {% for mudra in mudras %}
+        <tr>
+            <td>{{ mudra.sn }}</td>
+            <td>{{ mudra.name }}</td>
+            <td><img src="{{ mudra.image }}" alt="{{ mudra.name }}"></td>
+            <td>{{ mudra.description }}</td>
+            <td>{{ mudra.benefits }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mudra Voice Assistant</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #ffffff;
+            color: #000000;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Prevent body scroll */
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #25d366;
+            text-transform: uppercase;
+        }
+
+        /* Input and Button Container */
+        .input-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            outline: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #25d366;
+        }
+
+        button {
+            background: #25d366;
+            border: none;
+            padding: 12px 14px;
+            font-size: 16px;
+            color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        button:hover {
+            background-color: #128c7e;
+            transform: scale(1.1);
+        }
+
+        /* Mudra Details Container */
+        #mudraDetails {
+            background: #dcf8c6;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: left;
+            color: #333;
+            overflow-y: auto;
+            /* ✅ Only this section scrolls */
+            max-height: 300px;
+            scrollbar-width: thin;
+            scrollbar-color: #25d366 #f0f0f0;
+        }
+
+        /* Scrollbar Styling */
+        #mudraDetails::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mudraDetails::-webkit-scrollbar-thumb {
+            background-color: #25d366;
+            border-radius: 10px;
+        }
+
+        #mudraDetails::-webkit-scrollbar-track {
+            background-color: #f0f0f0;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #25d366;
+        }
+
+        p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        /* Floating Chatbot Button */
+        .floating-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25d366;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .floating-chatbot img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .floating-chatbot:hover {
+            background-color: #128c7e;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            input {
+                width: 80%;
+                font-size: 14px;
+            }
+
+            #mudraDetails {
+                width: 90%;
+            }
+
+            .floating-chatbot {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Mudra Chat & Voice Assistant</h2>
+
+    <!-- Input and Button Section -->
+    <div class="input-container">
+        <input type="text" id="mudraInput" placeholder="Enter Mudra Name">
+        <button onclick="fetchMudraInfo(false)">➔</button>
+        <button onclick="startVoiceRecognition()">🎤</button>
+    </div>
+
+    <!-- Mudra Details Section -->
+    <div id="mudraDetails"></div>
+
+    <script>
+        // ✅ Fetch Mudra Info
+        function fetchMudraInfo(isVoice) {
+            let mudraName = document.getElementById("mudraInput").value;
+            if (!mudraName) return;
+
+            const userMessage = `<h3>You asked:</h3> <p>${mudraName}</p>`;
+            document.getElementById("mudraDetails").innerHTML = userMessage;
+
+            fetch("/get_mudra", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mudra_name: mudraName, is_voice: isVoice })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        let mudraText = `
+                            <h3>${data.sanskrit_name} Mudra</h3>
+                            <p><strong>Alternative Name:</strong> ${data.alternative_name}</p>
+                            <p><strong>Type:</strong> ${data.type}</p>
+                            <p><strong>Benefits:</strong> ${data.benefits}</p>
+                            <p><strong>Procedure:</strong> ${data.procedure}</p>
+                            <p><strong>Dos:</strong> ${data.dos}</p>
+                            <p><strong>Don'ts:</strong> ${data.donts}</p>
+                            <p><strong>Cures:</strong> ${data.cures}</p>
+                            <p><strong>Time:</strong> ${data.time}</p>
+                            <p><strong>Frequency:</strong> ${data.frequency}</p>
+                        `;
+                        document.getElementById("mudraDetails").innerHTML += mudraText;
+                    } else {
+                        document.getElementById("mudraDetails").innerHTML = `<p style="color:red;">${data.message}</p>`;
+                    }
+                });
+        }
+
+        // ✅ Start Voice Recognition
+        function startVoiceRecognition() {
+            let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function (event) {
+                let voiceText = event.results[0][0].transcript;
+                document.getElementById("mudraInput").value = voiceText;
+                fetchMudraInfo(true);
+            };
+        }
+    </script>
+
+</body>
+
+</html>
